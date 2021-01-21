@@ -1,0 +1,22 @@
+{
+    "Name": "Example",
+    "Description": "Example Unit Description 超长描述测试 示例单元 描述",
+    "WorkDirectory": "C:\\Services\\Example",
+    "StartCommand": "C:\\Services\\Example\\example.exe",
+    "StartCommandArguments": "-v",
+    "StopCommand": null,
+    "StopCommandArguments": null,
+    "RestartCommand": null,
+    "RestartCommandArguments": null,
+    "AutoStart": false,
+    "AutoStartDelay": 3,
+    "RestartWhenException": false,
+    "PriorityClass": null,
+    "ProcessorAffinity": null,
+    "EnvironmentVariables": {
+        "flag1": "true",
+        "beep": "true"
+    },
+    "MonitorPerformanceUsage": false,
+    "MonitorNetworkUsage": false
+}

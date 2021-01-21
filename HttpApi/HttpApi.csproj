@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageId>net.skydust.winds.HttpApi</PackageId>
+    <Version>0.1</Version>
+    <Authors>ragnaroks</Authors>
+    <Company>skydust</Company>
+    <Product>winds</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="ControllerEntities\Default\ErrorResponse.cs" />
+    <Content Include="ControllerEntities\Default\IndexResponse.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="data\ReadMe.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="logs\ReadMe.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="units\ReadMe.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="users\ReadMe.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

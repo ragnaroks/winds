@@ -1,0 +1,19 @@
+{
+    "Password": "winds7355608",
+    "Nickname": "演示用户1",
+    "Description": "测试专用",
+    "Mark": "这段文本只有管理员看得到",
+    "Type": 2,
+    "Enabled": true,
+    "RunAsList": [
+        {
+            "Username": "LocalService",
+            "Password": null
+        },
+        {
+            "Username": "NetworkService",
+            "Password": null
+        }
+    ],
+    "UnitList": []
+}

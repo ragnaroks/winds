@@ -1,0 +1,19 @@
+{
+    "Name": "nginx",
+    "Description": null,
+    "WorkDirectory": "C:\\Services\\Nginx",
+    "StartCommand": "C:\\Services\\Nginx\\nginx.exe",
+    "StartCommandArguments": "-c C:\\Services\\Nginx\\nginx.conf",
+    "StopCommand": "C:\\Services\\Nginx\\nginx.exe",
+    "StopCommandArguments": "-s quit",
+    "RestartCommand": "C:\\Services\\Nginx\\nginx.exe",
+    "RestartCommandArguments": "-s reload",
+    "AutoStart": false,
+    "AutoStartDelay": 10,
+    "RestartWhenException": false,
+    "PriorityClass": null,
+    "ProcessorAffinity": null,
+    "EnvironmentVariables": null,
+    "MonitorPerformanceUsage": false,
+    "MonitorNetworkUsage": false
+}

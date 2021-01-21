@@ -1,0 +1,19 @@
+{
+    "Name": "minecraft",
+    "Description": "v1.15.2 #371",
+    "WorkDirectory": "D:\\Minecraft\\Inst1",
+    "StartCommand": "C:\\Program Files\\AdoptOpenJDK\\jdk-11.0.6.10-openj9\\bin\\java.exe",
+    "StartCommandArguments": "-jar paper-371.jar -nogui",
+    "StopCommand": null,
+    "StopCommandArguments": null,
+    "RestartCommand": null,
+    "RestartCommandArguments": null,
+    "AutoStart": false,
+    "AutoStartDelay": 10,
+    "RestartWhenException": false,
+    "PriorityClass": null,
+    "ProcessorAffinity": null,
+    "EnvironmentVariables": null,
+    "MonitorPerformanceUsage": false,
+    "MonitorNetworkUsage": false
+}

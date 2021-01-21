@@ -1,0 +1,19 @@
+{
+    "Name": "ArchiSteamFarm",
+    "Description": "ArchiSteamFarm",
+    "WorkDirectory": "C:\\Services\\ArchiSteamFarm",
+    "StartCommand": "C:\\Program Files\\dotnet\\dotnet.exe",
+    "StartCommandArguments": "C:\\Services\\ArchiSteamFarm\\ArchiSteamFarm.dll",
+    "StopCommand": null,
+    "StopCommandArguments": null,
+    "RestartCommand": null,
+    "RestartCommandArguments": null,
+    "AutoStart": false,
+    "AutoStartDelay": 10,
+    "RestartWhenException": false,
+    "PriorityClass": null,
+    "ProcessorAffinity": null,
+    "EnvironmentVariables": null,
+    "MonitorPerformanceUsage": false,
+    "MonitorNetworkUsage": false
+}
