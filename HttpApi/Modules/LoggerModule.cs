@@ -80,6 +80,7 @@ namespace HttpApi.Modules {
             }catch{
                 throw;
             }
+            this.LogQueue=new ConcurrentQueue<Log>();
             this.TimerEnable=true;
         }
 

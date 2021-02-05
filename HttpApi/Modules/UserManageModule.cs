@@ -54,9 +54,9 @@ namespace HttpApi.Modules {
                 this.LoggerModule.Log(LogLevel.Error,"Modules.UserManageModule.Parse",$"解析用户配置文件失败，打开文件异常，{exception.Message}，{exception.StackTrace}");
                 return (false,null);
             }
-            Memory<Byte> bytes=new Memory<Byte>();
+            Byte[] bytes=new Byte[fileStream.Length];
             try {
-                fileStream.Read(bytes.Span);
+                fileStream.Read(bytes,0,bytes.GetLength(0));
             }catch(Exception exception){
                 this.LoggerModule.Log(LogLevel.Error,"Modules.UserManageModule.Parse",$"解析用户配置文件失败，读取文件异常，{exception.Message}，{exception.StackTrace}");
                 return (false,null);
@@ -65,7 +65,7 @@ namespace HttpApi.Modules {
             }
             User user;
             try {
-                user=JsonSerializer.Deserialize<User>(bytes.Span);
+                user=JsonSerializer.Deserialize<User>(bytes);
             }catch(Exception exception){
                 this.LoggerModule.Log(LogLevel.Error,"Modules.UserManageModule.Parse",$"解析用户配置文件失败，反序列化异常，{exception.Message}，{exception.StackTrace}");
                 return (false,null);
@@ -192,9 +192,9 @@ namespace HttpApi.Modules {
                 this.LoggerModule.Log(LogLevel.Error,"Modules.UserManageModule.RemoveUser",$"修改用户配置文件时打开文件异常，{exception.Message}，{exception.StackTrace}");
                 return false;
             }
-            Memory<Byte> bytes=JsonSerializer.SerializeToUtf8Bytes(modifiedUser);
+            Byte[] bytes=JsonSerializer.SerializeToUtf8Bytes(modifiedUser);
             try {
-                fileStream.Write(bytes.Span);
+                fileStream.Write(bytes,0,bytes.GetLength(0));
                 fileStream.Flush();
             }catch(Exception exception) {
                 this.LoggerModule.Log(LogLevel.Error,"Modules.UserManageModule.RemoveUser",$"修改用户配置文件时写入文件异常，{exception.Message}，{exception.StackTrace}");

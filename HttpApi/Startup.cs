@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HttpApi {
     public class Startup {
@@ -15,6 +17,7 @@ namespace HttpApi {
             //this.Configuration=configuration;
             Program.Settings.SetAllowCorsOrigin(configuration.GetValue<String>("AllowCorsOrigin",null));
             Program.Settings.SetDataDirectory(configuration.GetValue<String>("DataDirectory",null));
+            Program.Settings.SetDevelopMode(configuration.GetValue<Boolean>("DevelopMode",false));
             //验证
             if(String.IsNullOrWhiteSpace(Program.Settings.DataDirectory) || !Directory.Exists(Program.Settings.DataDirectory)){throw new ArgumentNullException("DataDirectory","数据根目录无效");}
         }
@@ -55,12 +58,11 @@ namespace HttpApi {
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app,IWebHostEnvironment env,IHostApplicationLifetime lifetime,
+        public void Configure(IApplicationBuilder app,IHostApplicationLifetime lifetime,
             Filters.RequireUserAttribute requireUserAttribute,Filters.RequireManagerAttribute requireManageAttributer,
             Modules.LoggerModule loggerModule,Modules.UserManageModule userManageModule){
-            if(env.IsDevelopment()) {
+            if(Program.Settings.DevelopMode) {
                 app.UseDeveloperExceptionPage();
-                Program.Settings.SetDevelopMode(true);
             } else {
                 app.UseExceptionHandler("/Default/Error");
                 app.UseMiddleware<Middlewares.ErrorHandlingMiddleware>();
@@ -70,17 +72,21 @@ namespace HttpApi {
             app.UseEndpoints(endpoints=>{
                 endpoints.MapControllerRoute(name:"default",pattern:"{controller=Default}/{action=Index}/{id?}");
             });
-
+            
             //生命周期
             lifetime.ApplicationStarted.Register(()=>{
                 loggerModule.Log(LogLevel.Warning,"Startup.Configure","winds 服务主机已启动");
                 //过滤器预热
-                _=requireUserAttribute.GetHashCode();
-                _=requireManageAttributer.GetHashCode();
+                _=Task.Run(()=>{
+                    _=requireUserAttribute.GetHashCode();
+                    _=requireManageAttributer.GetHashCode();
+                });
                 //模块预热
-                _=userManageModule.GetHashCode();
-                //_=unitManageModule.GetHashCode();
-                //_=unitLoggerModule.GetHashCode();
+                _=Task.Run(()=>{
+                    _=userManageModule.GetHashCode();
+                    //_=unitManageModule.GetHashCode();
+                    //_=unitLoggerModule.GetHashCode();
+                });
             });
             lifetime.ApplicationStopping.Register(()=>{
                 loggerModule.Log(LogLevel.Warning,"Startup.Configure","winds 服务主机正在停止");
