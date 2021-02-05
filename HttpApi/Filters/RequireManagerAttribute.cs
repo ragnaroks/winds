@@ -46,27 +46,28 @@ namespace HttpApi.Filters {
                 context.Result=new ContentResult{Content=response.Serialize(),ContentType="application/json",StatusCode=401};
                 return;
             }
-            if(!this.UserManageModule.AuthUser(username,password,out User user)){
+            (Boolean,User) authUser=this.UserManageModule.AuthUser(username,password);
+            if(!authUser.Item1){
                 response.SetErrorType(1).SetErrorMessage("检查用户失败").SetReadableErrorMessage("鉴权失败");
                 context.Result=new ContentResult{Content=response.Serialize(),ContentType="application/json",StatusCode=401};
                 return;
             }
-            if(user==null){
+            if(authUser.Item2==null){
                 response.SetErrorType(1).SetErrorMessage("用户数据不存在").SetReadableErrorMessage("鉴权失败");
                 context.Result=new ContentResult{Content=response.Serialize(),ContentType="application/json",StatusCode=401};
                 return;
             }
-            if(user.Disabled){
+            if(authUser.Item2.Disabled){
                 response.SetErrorType(1).SetErrorMessage("用户已被禁用").SetReadableErrorMessage("鉴权失败");
                 context.Result=new ContentResult{Content=response.Serialize(),ContentType="application/json",StatusCode=401};
                 return;
             }
-            if(user.Type>1){
+            if(authUser.Item2.Type>1){
                 response.SetErrorType(1).SetErrorMessage("用户无权限访问").SetReadableErrorMessage("鉴权失败");
                 context.Result=new ContentResult{Content=response.Serialize(),ContentType="application/json",StatusCode=403};
                 return;
             }
-            context.HttpContext.Items["user"]=user;
+            context.HttpContext.Items["user"]=authUser.Item2;
         }
     }
 }

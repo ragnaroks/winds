@@ -1,6 +1,6 @@
 using System;
 
-namespace HttpApi.Options {
+namespace HttpApi.ModuleOptions {
     public class UnitLoggerModuleOptions {
         /// <summary>单元日志存放目录</summary>
         public String UnitLogsDirectory{get;set;}

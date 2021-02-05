@@ -7,49 +7,15 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using HttpApi.ModuleEntities.UnitLogger;
-using HttpApi.Options;
+using HttpApi.ModuleOptions;
 
 namespace HttpApi.Modules {
     /// <summary>单元日志模块</summary>
     public class UnitLoggerModule:IDisposable {
-        #region IDisposable Support
-        private bool disposedValue = false; // 要检测冗余调用
-
-        protected virtual void Dispose(bool disposing) {
-            //写完所有日志
-            //this.TimerCallback(null);
-
-            if (!disposedValue) {
-                if (disposing) {
-                    // TODO: 释放托管状态(托管对象)。
-                    this.Timer?.Dispose();
-                }
-
-                // TODO: 释放未托管的资源(未托管的对象)并在以下内容中替代终结器。
-                // TODO: 将大型字段设置为 null。
-                this.UnitLogQueue=null;
-
-                disposedValue=true;
-            }
-        }
-
-        // TODO: 仅当以上 Dispose(bool disposing) 拥有用于释放未托管资源的代码时才替代终结器。
-        ~UnitLoggerModule() {
-            // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
-            Dispose(false);
-        }
-
-        // 添加此代码以正确实现可处置模式。
-        public void Dispose() {
-            // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
-            Dispose(true);
-            // TODO: 如果在以上内容中替代了终结器，则取消注释以下行。
-            GC.SuppressFinalize(this);
-        }
-        #endregion
-
-        private ILogger<UnitLoggerModule> Logger{get;}
+        /// <summary>选项</summary>
         private IOptions<UnitLoggerModuleOptions> Options{get;}
+        /// <summary>日志</summary>
+        private LoggerModule LoggerModule{get;}
         /// <summary>定时器</summary>
         private Timer Timer{get;}=null;
         /// <summary>是否启用定时器</summary>
@@ -57,14 +23,43 @@ namespace HttpApi.Modules {
         /// <summary>日志</summary>
         private ConcurrentQueue<UnitLog> UnitLogQueue{get;set;}=null;
 
+        #region IDisposable
+        private bool disposedValue;
+        protected virtual void Dispose(bool disposing) {
+            if(!disposedValue) {
+                if(disposing) {
+                    // TODO: 释放托管状态(托管对象)
+                    this.Timer?.Dispose();
+                }
+
+                // TODO: 释放未托管的资源(未托管的对象)并替代终结器
+                // TODO: 将大型字段设置为 null
+                disposedValue=true;
+            }
+        }
+
+        // // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
+        // ~UnitLoggerModule()
+        // {
+        //     // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose() {
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
+
         /// <summary>
         /// 初始化模块
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="options"></param>
-        public UnitLoggerModule(ILogger<UnitLoggerModule> logger,IOptions<UnitLoggerModuleOptions> options){
-            this.Logger=logger;
-            this.Options=options;
+        public UnitLoggerModule(IOptions<UnitLoggerModuleOptions> options,LoggerModule loggerModule){
+            this.Options=options??throw new ArgumentNullException(nameof(options),"参数不能为空");
+            this.LoggerModule=loggerModule??throw new ArgumentNullException(nameof(loggerModule),"参数不能为空");
             //检查日志目录
             if(String.IsNullOrWhiteSpace(this.Options.Value.UnitLogsDirectory)){throw new Exception("单元日志存储目录无效");}
             if(!Directory.Exists(this.Options.Value.UnitLogsDirectory)){
@@ -83,7 +78,7 @@ namespace HttpApi.Modules {
             //
             this.TimerEnable=true;
             this.UnitLogQueue=new ConcurrentQueue<UnitLog>();
-            this.Logger.LogInformation("winds 单元日志模块已初始化");
+            loggerModule.Log(LogLevel.Warning,"Modules.UnitLoggerModule.UnitLoggerModule","单元日志模块已初始化");
         }
 
         /// <summary>

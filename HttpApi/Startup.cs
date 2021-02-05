@@ -1,9 +1,9 @@
+using HttpApi.ModuleEnums.Logger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 
@@ -34,7 +34,13 @@ namespace HttpApi {
                     builder.WithOrigins(Program.Settings.AllowCorsOrigin).AllowAnyHeader().AllowAnyMethod().AllowCredentials().SetPreflightMaxAge(new TimeSpan(1,0,0,0));
                 });
             });
-            services.AddSingleton<Modules.UserManageModule>().Configure<Options.UserManageModuleOptions>(options=>{
+            //日志模块
+            services.AddSingleton<Modules.LoggerModule>().Configure<ModuleOptions.LoggerModuleOptions>(options=>{
+                options.LogsDirectory=Program.Settings.LogsDirectory;
+                options.WritePeriod=1000;
+                options.DevelopMode=Program.Settings.DevelopMode;
+            });
+            services.AddSingleton<Modules.UserManageModule>().Configure<ModuleOptions.UserManageModuleOptions>(options=>{
                 options.UsersDirectory=Program.Settings.UsersDirectory;
             });
             services.AddSingleton<Filters.RequireUserAttribute>();
@@ -49,14 +55,15 @@ namespace HttpApi {
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app,IWebHostEnvironment env,IHostApplicationLifetime lifetime,ILogger<Startup> logger,
-            Modules.UserManageModule userManageModule,
-            Filters.RequireUserAttribute requireUserAttribute,Filters.RequireManagerAttribute requireManageAttributer){
+        public void Configure(IApplicationBuilder app,IWebHostEnvironment env,IHostApplicationLifetime lifetime,
+            Filters.RequireUserAttribute requireUserAttribute,Filters.RequireManagerAttribute requireManageAttributer,
+            Modules.LoggerModule loggerModule,Modules.UserManageModule userManageModule){
             if(env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
                 Program.Settings.SetDevelopMode(true);
             } else {
                 app.UseExceptionHandler("/Default/Error");
+                app.UseMiddleware<Middlewares.ErrorHandlingMiddleware>();
             }
             app.UseCors();
             app.UseRouting();
@@ -66,23 +73,24 @@ namespace HttpApi {
 
             //生命周期
             lifetime.ApplicationStarted.Register(()=>{
-                logger.LogWarning("winds 服务主机已启动");
-                //预热
+                loggerModule.Log(LogLevel.Warning,"Startup.Configure","winds 服务主机已启动");
+                //过滤器预热
+                _=requireUserAttribute.GetHashCode();
+                _=requireManageAttributer.GetHashCode();
+                //模块预热
                 _=userManageModule.GetHashCode();
                 //_=unitManageModule.GetHashCode();
                 //_=unitLoggerModule.GetHashCode();
-                _=requireUserAttribute.GetHashCode();
-                _=requireManageAttributer.GetHashCode();
             });
             lifetime.ApplicationStopping.Register(()=>{
-                logger.LogWarning("winds 服务主机正在停止");
+                loggerModule.Log(LogLevel.Warning,"Startup.Configure","winds 服务主机正在停止");
                 // 停止所有单元
                 //unitManageModule.StopAllUnits();
                 // 写完所有单元日志
                 //unitLoggerModule.WriteAllLogs();
             });
             lifetime.ApplicationStopped.Register(()=>{
-                logger.LogWarning("winds 服务主机已停止");
+                loggerModule.Log(LogLevel.Warning,"Startup.Configure","winds 服务主机已停止");
             });
         }
     }

@@ -4,53 +4,26 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using HttpApi.ModuleEntities.UnitManage;
-using HttpApi.Options;
+using System.ComponentModel;
+using HttpApi.ModuleOptions;
 
 namespace HttpApi.Modules {
-    public class UnitManageModule:IDisposable {
-        #region IDisposable
-        private bool disposedValue;
-
-        protected virtual void Dispose(bool disposing) {
-            if(!disposedValue) {
-                if(disposing) {
-                    // TODO: 释放托管状态(托管对象)
-                }
-
-                // TODO: 释放未托管的资源(未托管的对象)并替代终结器
-                // TODO: 将大型字段设置为 null
-                this.UnitWrapDictionary=null;
-
-                disposedValue=true;
-            }
-        }
-
-        // // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
-        // ~UnitHostModule()
-        // {
-        //     // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose() {
-            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
-
-        private ILogger<UnitManageModule> Logger{get;}
+    [Localizable(false)]
+    public class UnitManageModule {
+        /// <summary>配置项</summary>
         private IOptions<UnitManageModuleOptions> Options{get;}
+        /// <summary>日志模块</summary>
+        private LoggerModule LoggerModule{get;}
         private ConcurrentDictionary<String,UnitWrap> UnitWrapDictionary{get;set;}=new ConcurrentDictionary<String,UnitWrap>();
 
         /// <summary>
         /// 构造
         /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="options"></param>
-        public UnitManageModule(ILogger<UnitManageModule> logger,IOptions<UnitManageModuleOptions> options){
-            this.Logger=logger;
-            this.Options=options;
+        /// <param name="options">配置项依赖</param>
+        /// <param name="loggerModule">日志模块依赖</param>
+        public UnitManageModule(IOptions<UnitManageModuleOptions> options,LoggerModule loggerModule){
+            this.Options=options??throw new ArgumentNullException(nameof(options),"参数不能为空");
+            this.LoggerModule=loggerModule??throw new ArgumentNullException(nameof(loggerModule),"参数不能为空");
             //检查目录
             if(String.IsNullOrWhiteSpace(this.Options.Value.UnitDirectory)){throw new Exception("单元存储目录无效");}
             if(!Directory.Exists(this.Options.Value.UnitDirectory)){
@@ -61,7 +34,7 @@ namespace HttpApi.Modules {
                 }
             }
             //
-            this.Logger.LogInformation("winds 单元管理模块已初始化");
+            loggerModule.Log(LogLevel.Warning,"Modules.UnitManageModule.UnitManageModule","单元管理模块已初始化");
         }
 
         public void LoadAllUnits(){}
